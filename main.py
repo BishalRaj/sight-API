@@ -1,12 +1,16 @@
 from fastapi import FastAPI
+from scraper import *
 app = FastAPI()
 
 
 @app.get("/")
 def root():
-    return {"msg": "Hello world"}
+    return ["a", "b"]
 
 
-@app.get("/home")
-def home():
-    return {"msg": "Home"}
+@app.get("/scrape{state}")
+def scrapeAll(state: str):
+    if fetch(state):
+        return "success"
+    else:
+        return "failed"
