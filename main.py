@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from config.scraper import *
+from routes.user import user
 app = FastAPI()
 
-
-@app.get("/")
-def root():
-    return ["a", "b"]
+app.include_router(user)
 
 
 @app.get("/scrape{state}")
