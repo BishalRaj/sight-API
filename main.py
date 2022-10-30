@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from scraper import *
+from config.scraper import *
 app = FastAPI()
 
 
