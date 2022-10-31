@@ -1,8 +1,8 @@
-from lib2to3.pytree import Base
+from ctypes import Union
 from pydantic import BaseModel
 
 
 class User(BaseModel):
-    name: str
+    name: str = None
     email: str
     password: str

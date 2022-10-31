@@ -1,14 +1,20 @@
 from fastapi import FastAPI
-from config.scraper import *
-from routes.user import user
+from fastapi.middleware.cors import CORSMiddleware
+from controller.scraper import fetch
+from routes.user import userRouter
+from routes.scrape import scrapeRouter
 app = FastAPI()
 
-app.include_router(user)
+origins = ['https://localhost:3000',
+           'http://localhost:3000', 'http://127.0.0.1:3000']
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
-@app.get("/scrape{state}")
-def scrapeAll(state: str):
-    if fetch(state):
-        return "success"
-    else:
-        return "failed"
+app.include_router(userRouter)
+app.include_router(scrapeRouter)

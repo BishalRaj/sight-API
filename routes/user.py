@@ -1,12 +1,25 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from model.user import User
 from config.db import conn
-from schemas.user import usersEntity
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from schemas.user import userEntity, usersEntity
 
-user = APIRouter()
+userRouter = APIRouter()
+db = conn.sight.user
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='tokne')
 
 
-@user.get('/')
-async def login():
-    return usersEntity(conn.local.user.find())
+@userRouter.post('/auth/login')
+# async def login(user: User):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # return usersEntity(db.find())
+
+    print(form_data)
+    return {'access_token': form_data.email+'token'}
+
+
+@userRouter.post('/')
+async def create_user(user: User):
+    db.insert_one(dict(user))
+    return usersEntity(db.find())
