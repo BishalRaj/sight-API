@@ -1,8 +1,7 @@
-from ctypes import Union
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
     name: str = None
-    email: str
+    email: EmailStr
     password: str
