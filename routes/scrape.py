@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from controller.scraper import fetch
+from controller.scraper.ups_us import fetch
 scrapeRouter = APIRouter()
 
 

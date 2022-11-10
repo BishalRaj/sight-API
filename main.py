@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controller.scraper import fetch
+from controller.scraper.ups_us import fetch
 from routes.user import userRouter
 from routes.scrape import scrapeRouter
 app = FastAPI()
