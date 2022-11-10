@@ -5,8 +5,8 @@ from routes.user import userRouter
 from routes.scrape import scrapeRouter
 app = FastAPI()
 
-origins = ['https://localhost:3000',
-           'http://localhost:3000', 'http://127.0.0.1:3000']
+# origins = ['https://localhost:3000','http://localhost:3000', 'http://127.0.0.1:3000']
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,

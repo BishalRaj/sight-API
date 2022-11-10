@@ -47,7 +47,6 @@ def fetch(state_name):
             print(f'{counter} data fetched')
 
         wb.save(f'ups_{state_name}.xlsx')
-        # print('All Possible Data Fetched! Enjoy. . . ')
         return True
     except:
         return False

@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from fastapi import APIRouter, Depends
 
 from model.user import User, UserLogin
@@ -9,18 +10,11 @@ from controller.auth import jwt_handler
 
 userRouter = APIRouter()
 db = conn.sight.user
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='tokne')
 
 
-@userRouter.post("/token")
-async def token_generate(form_data: OAuth2PasswordRequestForm = Depends()):
-    print(form_data)
-    return {"access_token": form_data.username, "token_type": "bearer"}
-
-
-@userRouter.get('/auth/authenticate')
-async def authenticate(token: str = Depends(oauth2_scheme)):
-    return {"token": token}
+# @userRouter.get('/auth/authenticate')
+# async def authenticate(token: str = Depends(oauth2_scheme)):
+#     return {"token": token}
 
 
 @userRouter.post('/user/login')
@@ -28,11 +22,18 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if checkUser(form_data):
         return {"access_token": jwt_handler.signJWT(form_data.username), "token_type": "bearer"}
     else:
-        return {"access_token": None, "token_type": "bearer"}
+        return {"access_token": None, "detail": "Invalid Credentials"}
+
+
+@userRouter.post('/test')
+async def test(token: str):
+    print()
+    return {"token": jwt_handler.decodeJWT(token)}
 
 
 @userRouter.post('/')
 async def create_user(user: User):
+    jwt_handler.authenticate()
     db.insert_one(dict(user))
     return usersEntity(db.find())
 
