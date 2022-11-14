@@ -1,34 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
-import time
+
+# https://www.etsy.com/uk/search?q=bohimian+bracelet&page=1&ref=pagination
+# url = 'https://www.amazon.co.uk/s?k=dslr+camera&i=black-friday&ref=nb_sb_noss'
 
 
-def getdata(query):
-    source = requests.get('https://www.amazon.co.uk/s?k={query}')
-
-    time.sleep(2)
-
-    # soup = BeautifulSoup(source.html.html, 'html.parser')
-    soup = BeautifulSoup(source, 'html.parser')
-    return soup
-
-
-def getnextpage(soup):
-    # this will return the next page URL
-    pages = soup.find('ul', {'class': 'a-pagination'})
-    if not pages.find('li', {'class': 'a-disabled a-last'}):
-        url = 'https://www.amazon.co.uk' + \
-            str(pages.find('li', {'class': 'a-last'}).find('a')['href'])
-        return url
-    else:
-        return
+def getdata(url):
+    r = requests.get(url).text
+    # r.html.render(sleep=1)
+    soup = BeautifulSoup(r, 'html.parser')
+    data = soup.find('li', class_='wt-list-unstyled')
+    # print(data)
+    if data:
+        return data
 
 
-def getAllData(query):
+def getProductData(keyword: str):
+    counter = 1
     while True:
-        data = getdata(query)
-        url = getnextpage(data)
+        url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
+        data = getdata(url)
+        # url = getnextpage(data)
+        counter += 1
         if not url:
             break
         print(url)
-    return True
+
+
+# counter = 245
+# while True:
+#     url = f'https://www.etsy.com/uk/search?q=hello&page={counter}&ref=pagination'
+#     data = getdata(url)
+#     if not data:
+#         break
+#     print(url)
+#     counter = counter + 1
