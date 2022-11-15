@@ -6,13 +6,21 @@ from bs4 import BeautifulSoup
 
 
 def getdata(url):
-    r = requests.get(url).text
-    # r.html.render(sleep=1)
-    soup = BeautifulSoup(r, 'html.parser')
-    data = soup.find('li', class_='wt-list-unstyled')
-    # print(data)
-    if data:
-        return data
+    productData = []
+    try:
+        r = requests.get(url).text
+        soup = BeautifulSoup(r, 'html.parser')
+        hasData = soup.find('li', class_='wt-list-unstyled')
+        if hasData:
+            for data in soup.find_all('li', class_='wt-list-unstyled'):
+                name = data.find('h3', class_='v2-listing-card__title').text
+                price = data.find('span', class_='currency-value').text
+                # star = data.find('div', class_='sprite-img')['aria-label']
+                # print(star)
+                productData.append({'name': name, 'price': price})
+    except:
+        None
+    return productData
 
 
 def getProductData(keyword: str):
@@ -20,18 +28,31 @@ def getProductData(keyword: str):
     while True:
         url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
         data = getdata(url)
+        print(f'-----------------------{counter}-----------------------------')
+        # print(data)
+        print(f'-----------------------{counter}-----------------------------')
+
         # url = getnextpage(data)
-        counter += 1
-        if not url:
+
+        if not data:
             break
-        print(url)
+        else:
+            counter += 1
+        # print(url)
 
 
-# counter = 245
-# while True:
-#     url = f'https://www.etsy.com/uk/search?q=hello&page={counter}&ref=pagination'
-#     data = getdata(url)
-#     if not data:
-#         break
-#     print(url)
-#     counter = counter + 1
+def getProductByPage(soup):
+    try:
+        data = []
+        for data in soup.find_all('li', class_='wt-list-unstyled'):
+            name = data.find('h3', class_='v2-listing-card__title').text
+            price = data.find('span', class_='currency-value').text
+            # star = data.find('div', class_='sprite-img')['aria-label']
+            print(name)
+            print(price)
+            # print(star)
+            data.append({'name': name, 'price': price})
+
+        return data
+    except:
+        return None
