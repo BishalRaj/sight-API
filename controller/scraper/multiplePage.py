@@ -1,9 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-# https://www.etsy.com/uk/search?q=bohimian+bracelet&page=1&ref=pagination
-# url = 'https://www.amazon.co.uk/s?k=dslr+camera&i=black-friday&ref=nb_sb_noss'
-
 
 def getdata(url):
     productData = []
@@ -13,11 +10,12 @@ def getdata(url):
         hasData = soup.find('li', class_='wt-list-unstyled')
         if hasData:
             for data in soup.find_all('li', class_='wt-list-unstyled'):
+                p_id = data.find(
+                    'div', class_='wt-height-full')['data-logger-id']
                 name = data.find('h3', class_='v2-listing-card__title').text
                 price = data.find('span', class_='currency-value').text
-                # star = data.find('div', class_='sprite-img')['aria-label']
-                # print(star)
-                productData.append({'name': name, 'price': price})
+                productData.append(
+                    {'p_id': p_id, 'name': name, 'price': price})
     except:
         None
     return productData
@@ -28,31 +26,42 @@ def getProductData(keyword: str):
     while True:
         url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
         data = getdata(url)
-        print(f'-----------------------{counter}-----------------------------')
-        # print(data)
-        print(f'-----------------------{counter}-----------------------------')
-
-        # url = getnextpage(data)
 
         if not data:
             break
         else:
             counter += 1
-        # print(url)
 
 
-def getProductByPage(soup):
+def getSingleProduct(url: str):
+
+    singleProduct = []
     try:
-        data = []
-        for data in soup.find_all('li', class_='wt-list-unstyled'):
-            name = data.find('h3', class_='v2-listing-card__title').text
-            price = data.find('span', class_='currency-value').text
-            # star = data.find('div', class_='sprite-img')['aria-label']
-            print(name)
-            print(price)
-            # print(star)
-            data.append({'name': name, 'price': price})
-
-        return data
+        r = requests.get(url).text
+        soup = BeautifulSoup(r, 'html.parser')
+        hasData = soup.find('h1', class_='wt-break-word')
+        if hasData:
+            for data in soup.find_all('div', class_='body-wrap'):
+                name = data.find('h1', class_='wt-break-word').text
+                price = data.find('p', class_='wt-text-title-03').text
+                review = data.find(
+                    'h2', class_='wt-mr-xs-2 wt-text-body-03').text
+                sales = data.find('span', class_='wt-text-caption').text
+                rating = data.find("input", {"name": 'rating'}).get('value')
+                img = data.find('img', class_='carousel-image')['src']
+                singleProduct.append({'name': cleanData(name), 'price': cleanData(removeExtras(price, "£")), 'rating': cleanData(rating), 'sales': cleanData(removeExtras(sales, 'sales')),
+                                      'review': cleanData(removeExtras(review, "reviews")), 'img': img})
     except:
-        return None
+        None
+    return singleProduct
+
+
+def cleanData(data: str):
+    data.replace("\n", "")
+    data = data.strip()
+    return data
+
+
+def removeExtras(data: str, extra: str):
+    data = data.replace(extra, "")
+    return data
