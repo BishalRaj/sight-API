@@ -10,15 +10,17 @@ def getdata(url):
         hasData = soup.find('li', class_='wt-list-unstyled')
         if hasData:
             for data in soup.find_all('li', class_='wt-list-unstyled'):
-                p_id = data.find(
+                pid = data.find(
                     'div', class_='wt-height-full')['data-logger-id']
                 name = data.find('h3', class_='v2-listing-card__title').text
                 price = data.find('span', class_='currency-value').text
                 productData.append(
-                    {'p_id': p_id, 'name': name, 'price': price})
+                    {'pid': pid, 'name': name, 'price': price})
     except:
         None
     return productData
+
+# Created data fetching for each product
 
 
 def getProductData(keyword: str):
@@ -42,6 +44,8 @@ def getSingleProduct(url: str):
         hasData = soup.find('h1', class_='wt-break-word')
         if hasData:
             for data in soup.find_all('div', class_='body-wrap'):
+                pid = data.find(
+                    'div', class_='listing-page-image-carousel-component')['data-palette-listing-id']
                 name = data.find('h1', class_='wt-break-word').text
                 price = data.find('p', class_='wt-text-title-03').text
                 review = data.find(
@@ -49,8 +53,9 @@ def getSingleProduct(url: str):
                 sales = data.find('span', class_='wt-text-caption').text
                 rating = data.find("input", {"name": 'rating'}).get('value')
                 img = data.find('img', class_='carousel-image')['src']
-                singleProduct.append({'name': cleanData(name), 'price': cleanData(removeExtras(price, "£")), 'rating': cleanData(rating), 'sales': cleanData(removeExtras(sales, 'sales')),
+                singleProduct.append({'pid': pid, 'name': cleanData(name), 'price': cleanData(removeExtras(removeExtras(removeExtras(price, "+"), "Price:"), "£")), 'rating': cleanData(rating), 'sales': cleanData(removeExtras(sales, 'sales')),
                                       'review': cleanData(removeExtras(review, "reviews")), 'img': img})
+
     except:
         None
     return singleProduct
