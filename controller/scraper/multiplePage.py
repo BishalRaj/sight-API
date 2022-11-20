@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import logging
+logger = logging.getLogger('ftpuploader')
 
 
 def getdata(url):
@@ -50,14 +52,19 @@ def getSingleProduct(url: str):
                 price = data.find('p', class_='wt-text-title-03').text
                 review = data.find(
                     'h2', class_='wt-mr-xs-2 wt-text-body-03').text
-                sales = data.find('span', class_='wt-text-caption').text
+                sales = ''
+                for salesdata in data.find_all('span', class_='wt-text-caption'):
+                    if "sales" in salesdata.text:
+                        sales = salesdata.text
+                        break
                 rating = data.find("input", {"name": 'rating'}).get('value')
                 img = data.find('img', class_='carousel-image')['src']
-                singleProduct.append({'pid': pid, 'name': cleanData(name), 'price': cleanData(removeExtras(removeExtras(removeExtras(price, "+"), "Price:"), "£")), 'rating': cleanData(rating), 'sales': cleanData(removeExtras(sales, 'sales')),
-                                      'review': cleanData(removeExtras(review, "reviews")), 'img': img})
+                singleProduct.append({'pid': pid, 'name': cleanData(name), 'price': cleanData(removeExtras(removeExtras(removeExtras(price, "+"), "Price:"), "£")), 'rating': cleanData(rating), 'sales': cleanData(removeChar(sales)),
+                                      'review': cleanData(removeChar(review)), 'img': img})
 
-    except:
-        None
+    except Exception as e:
+        logger.error(e)
+        # None
     return singleProduct
 
 
@@ -70,3 +77,7 @@ def cleanData(data: str):
 def removeExtras(data: str, extra: str):
     data = data.replace(extra, "")
     return data
+
+
+def removeChar(data: str):
+    return ''.join(i for i in data if i.isdigit())
