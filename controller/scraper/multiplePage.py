@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+
 logger = logging.getLogger('ftpuploader')
 
 
@@ -38,7 +39,6 @@ def getProductData(keyword: str):
 
 
 def getSingleProduct(url: str):
-
     singleProduct = []
     try:
         r = requests.get(url).text
@@ -61,7 +61,6 @@ def getSingleProduct(url: str):
                 img = data.find('img', class_='carousel-image')['src']
                 singleProduct.append({'pid': pid, 'name': cleanData(name), 'price': cleanData(removeExtras(removeExtras(removeExtras(price, "+"), "Price:"), "£")), 'rating': cleanData(rating), 'sales': cleanData(removeChar(sales)),
                                       'review': cleanData(removeChar(review)), 'img': img})
-
     except Exception as e:
         logger.error(e)
         # None
