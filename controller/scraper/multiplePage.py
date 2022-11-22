@@ -1,3 +1,4 @@
+from controller.dataHandler.etzy import saveItemData
 import requests
 from bs4 import BeautifulSoup
 import logging
@@ -60,10 +61,10 @@ def getSingleProduct(url: str):
                 rating = data.find("input", {"name": 'rating'}).get('value')
                 img = data.find('img', class_='carousel-image')['src']
                 singleProduct.append({'pid': pid, 'name': cleanData(name), 'price': cleanData(removeExtras(removeExtras(removeExtras(price, "+"), "Price:"), "£")), 'rating': cleanData(rating), 'sales': cleanData(removeChar(sales)),
-                                      'review': cleanData(removeChar(review)), 'img': img})
+                                      'review': cleanData(removeChar(review)), 'img': img, 'url': url})
+
     except Exception as e:
         logger.error(e)
-        # None
     return singleProduct
 
 

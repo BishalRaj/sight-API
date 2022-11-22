@@ -1,11 +1,18 @@
+import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from controller.scraper.ups_us import fetch
 from controller.scraper.multiplePage import getProductData, getSingleProduct
+from controller.dataHandler.etzy import saveItemTrackingData, saveItemData
+from schemas.item import itemEntity, itemsEntity
+from model.item import Item, TrackItem
+from controller.auth import jwt_handler
 scrapeRouter = APIRouter()
 
+logger = logging.getLogger('ftpuploader')
 
-class Item(BaseModel):
+
+class ItemURL(BaseModel):
     url: str
 
 
@@ -31,17 +38,31 @@ def fetchALl(keyword: str):
 
 
 @scrapeRouter.post('/scrape/etzy/single')
-def fetchSingle(data: Item):
+def fetchSingle(data: ItemURL):
     # print(url)
     response = getSingleProduct(data.url)
-    if response:
-        response = response[0]
-    return response
+    if not response:
+        return
+    result = response[0]
+    try:
+        res = saveItemData(result)
+        result['id'] = str(res)
+    except:
+        None
+    return result
 
 
-@scrapeRouter.post('/scrape/etzy/single/save')
-def saveSingle(data: SaveItem):
-    print(data.token)
+@scrapeRouter.post('/scrape/etzy/single/track')
+def saveTracking(data: TrackItem):
+    isValidUser = jwt_handler.decodeJWT(data.token)
+
+    if isValidUser is None:
+        return {"msj": "Session Expired"}
+
+    if (isValidUser == {}):
+        return {"msj": "Invalid User"}
+
+    return isValidUser
 
 
 @scrapeRouter.get('/scrape/amazon/all/{keyword}')

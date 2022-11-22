@@ -1,6 +1,5 @@
 from http.client import HTTPException
 from fastapi import APIRouter, Depends
-
 from model.user import User, UserLogin
 from config.db import conn
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -25,10 +24,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         return {"access_token": None, "detail": "Invalid Credentials"}
 
 
-@userRouter.post('/test')
-async def test(token: str):
-    print()
-    return {"token": jwt_handler.decodeJWT(token)}
+# @userRouter.post('/test')
+# async def test(token: str):
+#     print()
+#     return {"token": jwt_handler.decodeJWT(token)}
 
 
 @userRouter.post('/')
