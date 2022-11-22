@@ -21,3 +21,7 @@ def saveItemData(data):
 
 def saveItemTrackingData(data: TrackItem):
     return data
+
+
+def getSingleDataFromDatabase(data):
+    return itemDB.find_one({"pid": data})

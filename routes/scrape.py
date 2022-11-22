@@ -2,8 +2,8 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from controller.scraper.ups_us import fetch
-from controller.scraper.multiplePage import getProductData, getSingleProduct
-from controller.dataHandler.etzy import saveItemTrackingData, saveItemData
+from controller.scraper.multiplePage import getProductData, scrapeSingleProduct
+from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase
 from schemas.item import itemEntity, itemsEntity
 from model.item import Item, TrackItem
 from controller.auth import jwt_handler
@@ -40,16 +40,23 @@ def fetchALl(keyword: str):
 @scrapeRouter.post('/scrape/etzy/single')
 def fetchSingle(data: ItemURL):
     # print(url)
-    response = getSingleProduct(data.url)
+    response = scrapeSingleProduct(data.url)
     if not response:
         return
     result = response[0]
     try:
-        res = saveItemData(result)
-        result['id'] = str(res)
-    except:
-        None
+        isAlreadySaved = getSingleDataFromDatabase(result['pid'])
+        if not isAlreadySaved:
+            res = saveItemData(result)
+            result['id'] = str(res)
+    except Exception as e:
+        logger.error(e)
     return result
+
+
+@scrapeRouter.post('/scrape/etzy/single/data')
+def getSingleDatabase(data):
+    getSingleDataFromDatabase(data)
 
 
 @scrapeRouter.post('/scrape/etzy/single/track')

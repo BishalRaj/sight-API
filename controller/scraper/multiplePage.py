@@ -39,7 +39,7 @@ def getProductData(keyword: str):
             counter += 1
 
 
-def getSingleProduct(url: str):
+def scrapeSingleProduct(url: str):
     singleProduct = []
     try:
         r = requests.get(url).text
