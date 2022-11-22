@@ -39,7 +39,6 @@ def fetchALl(keyword: str):
 
 @scrapeRouter.post('/scrape/etzy/single')
 def fetchSingle(data: ItemURL):
-    # print(url)
     response = scrapeSingleProduct(data.url)
     if not response:
         return
@@ -68,8 +67,8 @@ def saveTracking(data: TrackItem):
 
     if (isValidUser == {}):
         return {"msj": "Invalid User"}
-
-    return isValidUser
+    res = saveItemTrackingData(isValidUser['userID'], data.pid)
+    return res
 
 
 @scrapeRouter.get('/scrape/amazon/all/{keyword}')

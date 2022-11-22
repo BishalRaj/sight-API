@@ -19,8 +19,14 @@ def saveItemData(data):
         logger.error(e)
 
 
-def saveItemTrackingData(data: TrackItem):
-    return data
+def saveItemTrackingData(un, pid):
+    try:
+        res = trackingDB.insert_one(
+            dict({'username': un, 'pid': pid})).inserted_id
+        return str(res)
+
+    except Exception as e:
+        logger.error(e)
 
 
 def getSingleDataFromDatabase(data):
