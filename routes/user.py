@@ -24,10 +24,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         return {"access_token": None, "detail": "Invalid Credentials"}
 
 
-# @userRouter.post('/test')
-# async def test(token: str):
-#     print()
-#     return {"token": jwt_handler.decodeJWT(token)}
+@userRouter.get('/user/authenticate/{token}')
+async def test(token: str):
+    return {"token": jwt_handler.decodeJWT(token)}
 
 
 @userRouter.post('/')
@@ -38,6 +37,5 @@ async def create_user(user: User):
 
 
 def checkUser(data: UserLogin):
-
     if (userData := db.find_one({"username": data.username, "password": data.password})) is not None:
         return userData

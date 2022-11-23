@@ -1,11 +1,11 @@
 import logging
+import time
 from fastapi import APIRouter
 from pydantic import BaseModel
 from controller.scraper.ups_us import fetch
-from controller.scraper.multiplePage import getProductData, scrapeSingleProduct
-from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase, getAllDataByUser
-from schemas.item import itemEntity, itemsEntity
-from model.item import Item, TrackItem
+from controller.scraper.etzy import getProductData, scrapeSingleProduct, automateTracking
+from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase, getAllDataByUser, saveItemMicroData
+from model.item import TrackItem
 from controller.auth import jwt_handler
 scrapeRouter = APIRouter()
 
@@ -50,12 +50,11 @@ def fetchSingle(data: ItemURL):
             result['id'] = str(res)
     except Exception as e:
         logger.error(e)
+
+    saveItemMicroData({"pid": result['pid'], "price": result['price'], "date": time.time(),
+                      "sales": result['sales'], "rating": result['rating'], "review": result['review']})
+
     return result
-
-
-# @scrapeRouter.post('/scrape/etzy/single/data')
-# def getSingleDatabase(data):
-#     getSingleDataFromDatabase(data)
 
 
 @scrapeRouter.post('/scrape/etzy/single/track')
@@ -89,3 +88,8 @@ def fetchAll(keyword: str):
     if keyword[-1] == " ":
         keyword = keyword.rstrip(keyword[-1])
     return keyword
+
+
+@scrapeRouter.get('/scrape/automate')
+def automate():
+    return automateTracking()

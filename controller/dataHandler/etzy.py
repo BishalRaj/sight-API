@@ -1,18 +1,26 @@
 from schemas.tracking import trackingsEntity
 import logging
 from config.db import conn
-from schemas.item import itemsEntity
-
+# from controller.scraper.multiplePage import scrapeSingleProduct
 logger = logging.getLogger('ftpuploader')
 
 
 itemDB = conn.sight.item
 trackingDB = conn.sight.tracker
+microTrackingDB = conn.sight.micro
 
 
 def saveItemData(data):
     try:
         res = itemDB.insert_one(dict(data)).inserted_id
+        return res
+    except Exception as e:
+        logger.error(e)
+
+
+def saveItemMicroData(data):
+    try:
+        res = microTrackingDB.insert_one(dict(data)).inserted_id
         return res
     except Exception as e:
         logger.error(e)

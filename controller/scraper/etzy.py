@@ -2,6 +2,8 @@ from controller.dataHandler.etzy import saveItemData
 import requests
 from bs4 import BeautifulSoup
 import logging
+from schemas.item import itemsEntity
+from config.db import conn
 
 logger = logging.getLogger('ftpuploader')
 
@@ -81,3 +83,18 @@ def removeExtras(data: str, extra: str):
 
 def removeChar(data: str):
     return ''.join(i for i in data if i.isdigit())
+
+
+def automateTracking():
+    # get all items
+    # if fetched price is greater than saved price update item db and save in tracking
+    itemDB = conn.sight.item
+
+    ind = []
+    items = itemsEntity(itemDB.find())
+    counter = 1
+    for item in items:
+        print(f'fetching data number: {counter}')
+        ind.append(scrapeSingleProduct(item['url'])[0])
+        counter += 1
+    return ind
