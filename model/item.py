@@ -16,3 +16,8 @@ class Item(BaseModel):
 class TrackItem(BaseModel):
     token: str = Field(default=None)
     pid: str = Field(default=None)
+
+
+class TrackDetails(BaseModel):
+    username: str = Field(default=None)
+    pid: str = Field(default=None)

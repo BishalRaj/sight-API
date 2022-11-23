@@ -1,11 +1,10 @@
-from schemas.item import itemEntity, itemsEntity
+from schemas.tracking import trackingsEntity
 import logging
 from config.db import conn
-from model.item import Item, TrackItem
 from schemas.item import itemsEntity
-from bson import json_util
-import json
+
 logger = logging.getLogger('ftpuploader')
+
 
 itemDB = conn.sight.item
 trackingDB = conn.sight.tracker
@@ -31,3 +30,21 @@ def saveItemTrackingData(un, pid):
 
 def getSingleDataFromDatabase(data):
     return itemDB.find_one({"pid": data})
+
+
+def getAllDataByUser(username: str):
+    data = []
+    res = trackingsEntity(trackingDB.find({"username": username}))
+    for doc in res:
+        itemData = itemDB.find_one({"pid": doc["pid"]})
+        data.append({
+            "pid": itemData["pid"],
+            "name": itemData["name"],
+            "price": itemData["price"],
+            "rating": itemData["rating"],
+            "sales": itemData["sales"],
+            "review": itemData["review"],
+            "img": itemData["img"],
+            "url": itemData["url"]
+        })
+    return data

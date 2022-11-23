@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from controller.scraper.ups_us import fetch
 from controller.scraper.multiplePage import getProductData, scrapeSingleProduct
-from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase
+from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase, getAllDataByUser
 from schemas.item import itemEntity, itemsEntity
 from model.item import Item, TrackItem
 from controller.auth import jwt_handler
@@ -53,9 +53,9 @@ def fetchSingle(data: ItemURL):
     return result
 
 
-@scrapeRouter.post('/scrape/etzy/single/data')
-def getSingleDatabase(data):
-    getSingleDataFromDatabase(data)
+# @scrapeRouter.post('/scrape/etzy/single/data')
+# def getSingleDatabase(data):
+#     getSingleDataFromDatabase(data)
 
 
 @scrapeRouter.post('/scrape/etzy/single/track')
@@ -68,6 +68,19 @@ def saveTracking(data: TrackItem):
     if (isValidUser == {}):
         return {"msj": "Invalid User"}
     res = saveItemTrackingData(isValidUser['userID'], data.pid)
+    return res
+
+
+@scrapeRouter.get('/tracking/all/{token}')
+def getTrackingByUser(token: str):
+    isValidUser = jwt_handler.decodeJWT(token)
+
+    if isValidUser is None:
+        return {"msj": "Session Expired"}
+
+    if (isValidUser == {}):
+        return {"msj": "Invalid User"}
+    res = getAllDataByUser(isValidUser['userID'])
     return res
 
 
