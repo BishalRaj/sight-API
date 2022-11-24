@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controller.scraper.ups_us import fetch
 from routes.user import userRouter
 from routes.scrape import scrapeRouter
 from fastapi_utils.tasks import repeat_every
@@ -22,9 +21,11 @@ app.add_middleware(
 app.include_router(userRouter)
 app.include_router(scrapeRouter)
 
+# Automatically fetch data from tracking db and if any change, alert user and update data
+
 
 @app.on_event("startup")
-@repeat_every(seconds=60)  # 6 Hours
+@repeat_every(seconds=60*60*24)  # 24 hr
 def automate():
     try:
         automateTracking()
