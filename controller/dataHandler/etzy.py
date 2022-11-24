@@ -1,7 +1,6 @@
 from schemas.tracking import trackingsEntity
 import logging
 from config.db import conn
-# from controller.scraper.multiplePage import scrapeSingleProduct
 logger = logging.getLogger('ftpuploader')
 
 
@@ -56,3 +55,15 @@ def getAllDataByUser(username: str):
             "url": itemData["url"]
         })
     return data
+
+
+def getUserFromTrackingDB(pid: str):
+    res = trackingsEntity(trackingDB.find({"pid": pid}))
+    users = []
+    for user in res:
+        users.append(user['username'])
+    return users
+
+
+def updateProductData(data):
+    itemDB.find_one_and_update({'pid': data["pid"]}, {"$set": data})

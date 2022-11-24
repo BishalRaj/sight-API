@@ -5,8 +5,8 @@ import logging
 from schemas.item import itemsEntity
 from config.db import conn
 from controller.email import email
-from schemas.tracking import trackingEntity, trackingsEntity
-
+from controller.dataHandler.etzy import saveItemMicroData, getUserFromTrackingDB, updateProductData
+import time
 
 logger = logging.getLogger('ftpuploader')
 
@@ -93,7 +93,7 @@ def automateTracking():
     # if fetched price is greater than saved price update item db and save in tracking
     itemDB = conn.sight.item
 
-    ind = []
+    # ind = []
     items = itemsEntity(itemDB.find())
     counter = 1
     for item in items:
@@ -101,27 +101,19 @@ def automateTracking():
         # ind.append(scrapeSingleProduct(item['url'])[0])
         newData = scrapeSingleProduct(item['url'])[0]
 
-        # if scraped data == new data do nothing else alert user by sending email
+        # if price of scraped data is equal to new data do nothing else alert user by sending email
         if (newData['price'] != item['price']):
-            print('price changed')
-            users = getUser(item['pid'])
+            print('diff data')
+            users = getUserFromTrackingDB(item['pid'])
             if users is not []:
                 for user in users:
-                    print(user)
-                    subject = f"One of the product that you have been tracking has lowered the price. Please follow this link: {item['url']}"
+                    subject = f"One of the product that you have been tracking has changed the price from £{item['price']} to £{newData['price']} . Please follow this link: {item['url']}"
                     email.sendEmail(user, "Price Update", subject)
 
-                # save micro data such as price etc
-                # scrapeSingleProduct(item['url'])[0]
+        # save micro data such as price etc
+        saveItemMicroData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
+        ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
+        # Update product table with new data
+        updateProductData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
+        ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
         counter += 1
-    return ind
-
-
-def getUser(pid: str):
-    trackingDB = conn.sight.tracker
-    res = trackingsEntity(trackingDB.find({"pid": pid}))
-    users = []
-    for user in res:
-        # print(user['username'])
-        users.append(user['username'])
-    return users

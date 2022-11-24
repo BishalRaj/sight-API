@@ -7,6 +7,7 @@ from controller.scraper.etzy import getProductData, scrapeSingleProduct, automat
 from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase, getAllDataByUser, saveItemMicroData
 from model.item import TrackItem
 from controller.auth import jwt_handler
+
 scrapeRouter = APIRouter()
 
 logger = logging.getLogger('ftpuploader')
