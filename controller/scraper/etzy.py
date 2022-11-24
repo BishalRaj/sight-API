@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import logging
 from schemas.item import itemsEntity
 from config.db import conn
+from controller.email import email
+from schemas.tracking import trackingEntity, trackingsEntity
+
 
 logger = logging.getLogger('ftpuploader')
 
@@ -95,6 +98,30 @@ def automateTracking():
     counter = 1
     for item in items:
         print(f'fetching data number: {counter}')
-        ind.append(scrapeSingleProduct(item['url'])[0])
+        # ind.append(scrapeSingleProduct(item['url'])[0])
+        newData = scrapeSingleProduct(item['url'])[0]
+
+        # if scraped data == new data do nothing else alert user by sending email
+        if (newData['price'] != item['price']):
+            print('price changed')
+            users = getUser(item['pid'])
+            if users is not []:
+                for user in users:
+                    print(user)
+                    subject = f"One of the product that you have been tracking has lowered the price. Please follow this link: {item['url']}"
+                    email.sendEmail(user, "Price Update", subject)
+
+                # save micro data such as price etc
+                # scrapeSingleProduct(item['url'])[0]
         counter += 1
     return ind
+
+
+def getUser(pid: str):
+    trackingDB = conn.sight.tracker
+    res = trackingsEntity(trackingDB.find({"pid": pid}))
+    users = []
+    for user in res:
+        # print(user['username'])
+        users.append(user['username'])
+    return users

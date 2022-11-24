@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from schemas.user import userEntity, usersEntity
 from schemas.auth import authEntity, authenticationEntity
 from controller.auth import jwt_handler
+from controller.email import email
 
 userRouter = APIRouter()
 db = conn.sight.user
@@ -34,6 +35,11 @@ async def create_user(user: User):
     jwt_handler.authenticate()
     db.insert_one(dict(user))
     return usersEntity(db.find())
+
+
+@userRouter.post('/send/email')
+async def send_email():
+    email.sendEmail("hissey@getnada.com", "Test", "Hello")
 
 
 def checkUser(data: UserLogin):
