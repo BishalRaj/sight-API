@@ -60,7 +60,6 @@ def getProductData(keyword: str):
             counter += 1
     if not os.path.exists("excel"):
         os.makedirs("excel")
-        os.chmod('excel', 777)
     wb.save(fileName)
     return fileName
 
