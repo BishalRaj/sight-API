@@ -4,6 +4,7 @@ from routes.user import userRouter
 from routes.scrape import scrapeRouter
 from fastapi_utils.tasks import repeat_every
 from controller.scraper.etzy import automateTracking
+import os
 
 app = FastAPI()
 
@@ -29,5 +30,6 @@ app.include_router(scrapeRouter)
 def automate():
     try:
         automateTracking()
+
     except Exception as e:
         print(e)

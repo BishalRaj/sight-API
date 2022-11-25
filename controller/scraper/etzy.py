@@ -7,7 +7,8 @@ from config.db import conn
 from controller.email import email
 from controller.dataHandler.etzy import saveItemMicroData, getUserFromTrackingDB, updateProductData
 import time
-
+from openpyxl import Workbook, load_workbook
+import os
 logger = logging.getLogger('ftpuploader')
 
 
@@ -23,8 +24,10 @@ def getdata(url):
                     'div', class_='wt-height-full')['data-logger-id']
                 name = data.find('h3', class_='v2-listing-card__title').text
                 price = data.find('span', class_='currency-value').text
+                url = data.find('a', class_='listing-link')['href']
+                img = data.find('img', class_='wt-position-absolute')['src']
                 productData.append(
-                    {'pid': pid, 'name': name, 'price': price})
+                    {'pid': pid, 'name': name, 'price': price, 'img': img, 'url': url})
     except:
         None
     return productData
@@ -33,15 +36,33 @@ def getdata(url):
 
 
 def getProductData(keyword: str):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Data'
+
+    ws.append(['ID', 'Name',  'Price', 'ImageURL', 'URL'])
+    fileName = './excel/'+f'{time.time()}.xlsx'
+    product = []
     counter = 1
     while True:
         url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
         data = getdata(url)
+        product.append(data)
+        ws.append([str(data[0]['pid']), str(data[0]['name']), str(data[0]['price']),
+                  str(data[0]['img']), str(data[0]['url'])])
+        print(counter)
+        if (counter > 5):
+            break
 
         if not data:
             break
         else:
             counter += 1
+    if not os.path.exists("excel"):
+        os.makedirs("excel")
+        os.chmod('excel', 777)
+    wb.save(fileName)
+    return fileName
 
 
 def scrapeSingleProduct(url: str):

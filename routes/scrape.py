@@ -7,6 +7,7 @@ from controller.scraper.etzy import getProductData, scrapeSingleProduct, automat
 from controller.dataHandler.etzy import saveItemTrackingData, saveItemData, getSingleDataFromDatabase, getAllDataByUser, saveItemMicroData
 from model.item import TrackItem
 from controller.auth import jwt_handler
+from fastapi.responses import FileResponse
 
 scrapeRouter = APIRouter()
 
@@ -32,10 +33,8 @@ def fetchALl(state: str):
 
 @scrapeRouter.get('/scrape/etzy/{keyword}')
 def fetchALl(keyword: str):
-    if getProductData(keyword):
-        return "success"
-    else:
-        return "failed"
+    # return
+    return FileResponse(getProductData(keyword))
 
 
 @scrapeRouter.post('/scrape/etzy/single')

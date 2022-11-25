@@ -1,6 +1,7 @@
 from schemas.tracking import trackingsEntity
 import logging
 from config.db import conn
+from schemas.micro import microsEntity
 logger = logging.getLogger('ftpuploader')
 
 
@@ -44,7 +45,8 @@ def getAllDataByUser(username: str):
     res = trackingsEntity(trackingDB.find({"username": username}))
     for doc in res:
         itemData = itemDB.find_one({"pid": doc["pid"]})
-        data.append({
+        micro = microsEntity(microTrackingDB.find({"pid": doc["pid"]}))
+        data.append({"item": {
             "pid": itemData["pid"],
             "name": itemData["name"],
             "price": itemData["price"],
@@ -53,7 +55,7 @@ def getAllDataByUser(username: str):
             "review": itemData["review"],
             "img": itemData["img"],
             "url": itemData["url"]
-        })
+        }, "micro": micro})
     return data
 
 
