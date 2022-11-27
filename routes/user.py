@@ -26,20 +26,36 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @userRouter.get('/user/authenticate/{token}')
-async def test(token: str):
+async def authenticate(token: str):
     return {"token": jwt_handler.decodeJWT(token)}
 
 
-@userRouter.post('/')
+@userRouter.get('/user/details/{token}')
+async def getUserDetails(token: str):
+    auth = jwt_handler.decodeJWT(token)
+    if (auth == {} or auth == None):
+        return None
+    else:
+        user = db.find_one({"username": auth['userID']})
+        return {"name": user['name'], "username": user['username']}
+
+
+@userRouter.post('/user/register')
 async def create_user(user: User):
-    jwt_handler.authenticate()
+    # jwt_handler.authenticate()
+    checkUser = db.find_one({'username': user.username})
+    if checkUser is not None:
+        return {"token": None, "msj": 'User already exist!'}
     db.insert_one(dict(user))
-    return usersEntity(db.find())
+
+    return jwt_handler.signJWT(user.username)
+    # return usersEntity(db.find())
+    # return res
 
 
-@userRouter.post('/send/email')
-async def send_email():
-    email.sendEmail("hissey@getnada.com", "Test", "Hello")
+# @userRouter.post('/send/email')
+# async def send_email():
+#     email.sendEmail("hissey@getnada.com", "Test", "Hello")
 
 
 def checkUser(data: UserLogin):
