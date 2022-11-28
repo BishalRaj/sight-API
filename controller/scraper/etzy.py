@@ -48,8 +48,11 @@ def getProductData(keyword: str):
         url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
         data = getdata(url)
         product.append(data)
-        ws.append([str(data[0]['pid']), str(data[0]['name']), str(data[0]['price']),
-                  str(data[0]['img']), str(data[0]['url'])])
+        try:
+            ws.append([str(data[0]['pid']), str(data[0]['name']), str(data[0]['price']),
+                       str(data[0]['img']), str(data[0]['url'])])
+        except:
+            None
         print(counter)
         if (counter > 5):
             break

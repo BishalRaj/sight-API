@@ -49,13 +49,6 @@ async def create_user(user: User):
     db.insert_one(dict(user))
 
     return jwt_handler.signJWT(user.username)
-    # return usersEntity(db.find())
-    # return res
-
-
-# @userRouter.post('/send/email')
-# async def send_email():
-#     email.sendEmail("hissey@getnada.com", "Test", "Hello")
 
 
 def checkUser(data: UserLogin):

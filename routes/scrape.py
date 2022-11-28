@@ -35,10 +35,11 @@ def fetchALl(state: str):
 def fetchALl(keyword: str):
     # return
     return FileResponse(getProductData(keyword))
+    # return getProductData(keyword)
 
 
 @scrapeRouter.post('/scrape/etzy/single')
-def fetchSingle(data: ItemURL):
+async def fetchSingle(data: ItemURL):
     response = scrapeSingleProduct(data.url)
     if not response:
         return
@@ -51,8 +52,8 @@ def fetchSingle(data: ItemURL):
     except Exception as e:
         logger.error(e)
 
-    saveItemMicroData({"pid": result['pid'], "price": result['price'], "date": time.time(),
-                      "sales": result['sales'], "rating": result['rating'], "review": result['review']})
+    res = saveItemMicroData({"pid": result['pid'], "price": result['price'], "date": time.time(),
+                             "sales": result['sales'], "rating": result['rating'], "review": result['review']})
 
     return result
 
