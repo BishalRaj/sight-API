@@ -4,3 +4,7 @@ bcrypt
 beautifulsoup4
 bs4 
 uvicorn
+fastapi
+pydantic[email]
+python-decouple
+openpyxl

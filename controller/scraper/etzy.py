@@ -4,7 +4,7 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from openpyxl import Workbook, load_workbook
+# from openpyxl import Workbook, load_workbook
 
 from config.db import conn
 from controller.dataHandler.etzy import (getUserFromTrackingDB, saveItemData,
