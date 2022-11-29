@@ -25,7 +25,7 @@ app.include_router(scrapeRouter)
 # Automatically fetch data from tracking db and if any change, alert user and update data
 
 
-@app.on_event("startup")
+# @app.on_event("startup")
 @repeat_every(seconds=60*60*24)  # 24 hr
 def automate():
     try:

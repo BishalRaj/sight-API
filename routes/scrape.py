@@ -34,8 +34,9 @@ def fetchALl(state: str):
 @scrapeRouter.get('/scrape/etzy/{keyword}')
 def fetchALl(keyword: str):
     # return
-    return FileResponse(getProductData(keyword))
-    # return getProductData(keyword)
+    # file = getProductData(keyword)
+    # return FileResponse(file, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=file)
+    return getProductData(keyword)
 
 
 @scrapeRouter.post('/scrape/etzy/single')

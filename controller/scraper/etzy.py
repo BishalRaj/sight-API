@@ -1,14 +1,17 @@
-from controller.dataHandler.etzy import saveItemData
+import logging
+import os
+import time
+
 import requests
 from bs4 import BeautifulSoup
-import logging
-from schemas.item import itemsEntity
-from config.db import conn
-from controller.email import email
-from controller.dataHandler.etzy import saveItemMicroData, getUserFromTrackingDB, updateProductData
-import time
 from openpyxl import Workbook, load_workbook
-import os
+
+from config.db import conn
+from controller.dataHandler.etzy import (getUserFromTrackingDB, saveItemData,
+                                         saveItemMicroData, updateProductData)
+from controller.email import email
+from schemas.item import itemsEntity
+
 logger = logging.getLogger('ftpuploader')
 
 
@@ -36,35 +39,39 @@ def getdata(url):
 
 
 def getProductData(keyword: str):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = 'Data'
+    # wb = Workbook()
+    # ws = wb.active
+    # ws.title = 'Data'
 
-    ws.append(['ID', 'Name',  'Price', 'ImageURL', 'URL'])
-    fileName = './excel/'+f'{time.time()}.xlsx'
+    # ws.append(['ID', 'Name',  'Price', 'ImageURL', 'URL'])
+    # fileName = './excel/'+f'{time.time()}.xlsx'
     product = []
     counter = 1
     while True:
         url = f'https://www.etsy.com/uk/search?q={keyword}&page={counter}&ref=pagination'
         data = getdata(url)
-        product.append(data)
-        try:
-            ws.append([str(data[0]['pid']), str(data[0]['name']), str(data[0]['price']),
-                       str(data[0]['img']), str(data[0]['url'])])
-        except:
-            None
-        print(counter)
+
+        product.append({'pid': data[0]['pid'], 'name': cleanData(str(data[0]['name'])), 'price': cleanData(removeExtras(removeExtras(
+            removeExtras(str(data[0]['price']), "+"), "Price:"), "£")),   'img': str(data[0]['img']), 'url': str(data[0]['url'])})
+        # product.append(data)
+        # try:
+        #     ws.append([str(data[0]['pid']), str(data[0]['name']), str(data[0]['price']),
+        #                str(data[0]['img']), str(data[0]['url'])])
+        # except:
+        #     None
+        # print(counter)
         if (counter > 5):
             break
-
+        print(counter)
         if not data:
             break
         else:
             counter += 1
-    if not os.path.exists("excel"):
-        os.makedirs("excel")
-    wb.save(fileName)
-    return fileName
+    # if not os.path.exists("excel"):
+    #     os.makedirs("excel")
+    # isSaved = wb.save(fileName)
+    # print(isSaved)
+    return product
 
 
 def scrapeSingleProduct(url: str):
