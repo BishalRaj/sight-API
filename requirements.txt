@@ -3,3 +3,4 @@ python-multipart
 bcrypt
 beautifulsoup4
 bs4 
+uvicorn
