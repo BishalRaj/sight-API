@@ -36,13 +36,16 @@ async def getUserDetails(token: str):
     if (auth == {} or auth == None):
         return None
     else:
-        user = db.find_one({"username": auth['userID']})
-        return {"name": user['name'], "username": user['username']}
+        try:
+            user = db.find_one({"username": auth['userID']})
+            return {"name": user['name'], "username": user['username']}
+        except Exception as e:
+            print(e)
+            return {"msj": "Something went wrong"}
 
 
 @userRouter.post('/user/register')
 async def create_user(user: User):
-    # jwt_handler.authenticate()
     checkUser = db.find_one({'username': user.username})
     if checkUser is not None:
         return {"token": None, "msj": 'User already exist!'}

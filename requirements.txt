@@ -8,3 +8,4 @@ fastapi
 pydantic[email]
 python-decouple
 openpyxl
+fastapi_utils
