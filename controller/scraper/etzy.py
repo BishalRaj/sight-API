@@ -123,26 +123,29 @@ def automateTracking():
     itemDB = conn.sight.item
 
     # ind = []
-    items = itemsEntity(itemDB.find())
-    counter = 1
-    for item in items:
-        print(f'fetching data number: {counter}')
-        # ind.append(scrapeSingleProduct(item['url'])[0])
-        newData = scrapeSingleProduct(item['url'])[0]
+    try:
+        items = itemsEntity(itemDB.find())
+        counter = 1
+        for item in items:
+            print(f'fetching data number: {counter}')
+            # ind.append(scrapeSingleProduct(item['url'])[0])
+            newData = scrapeSingleProduct(item['url'])[0]
 
-        # if price of scraped data is equal to new data do nothing else alert user by sending email
-        if (newData['price'] != item['price']):
-            print('diff data')
-            users = getUserFromTrackingDB(item['pid'])
-            if users is not []:
-                for user in users:
-                    subject = f"One of the product that you have been tracking has changed the price from £{item['price']} to £{newData['price']} . Please follow this link: {item['url']}"
-                    email.sendEmail(user, "Price Update", subject)
+            # if price of scraped data is equal to new data do nothing else alert user by sending email
+            if (newData['price'] != item['price']):
+                print('diff data')
+                users = getUserFromTrackingDB(item['pid'])
+                if users is not []:
+                    for user in users:
+                        subject = f"One of the product that you have been tracking has changed the price from £{item['price']} to £{newData['price']} . Please follow this link: {item['url']}"
+                        email.sendEmail(user, "Price Update", subject)
 
-        # save micro data such as price etc
-        saveItemMicroData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
-        ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
-        # Update product table with new data
-        updateProductData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
-        ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
-        counter += 1
+            # save micro data such as price etc
+            saveItemMicroData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
+            ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
+            # Update product table with new data
+            updateProductData({"pid": newData['pid'], "price": newData['price'], "date": time.time(
+            ), "sales": newData['sales'], "rating": newData['rating'], "review": newData['review']})
+            counter += 1
+    except Exception as e:
+        print('@ automate tracking', e)
